@@ -1,0 +1,180 @@
+% ============================================================================
+% Mathematical Derivations — Quantum-Enhanced Credit Risk Framework
+% ============================================================================
+% Reference: "Quantum-Enhanced Smart Computing Framework for Sustainable
+%             Credit Risk Decision Communication" (Jain, Singh, et al., 2026)
+% ============================================================================
+
+\documentclass[11pt, a4paper]{article}
+
+% --- Packages ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{braket}          % Dirac notation
+\usepackage{physics}         % \abs, \norm, etc.
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+% --- Metadata ---
+\title{Mathematical Derivations\\[0.3em]
+  \large Quantum-Enhanced Smart Computing Framework\\
+  for Sustainable Credit Risk Decision Communication}
+\author{Jain, Singh, et al.\ (2026) — Companion Derivations}
+\date{}
+
+% --- Custom commands ---
+\newcommand{\RY}{\mathrm{R}_Y}
+\newcommand{\RX}{\mathrm{R}_X}
+\newcommand{\RZ}{\mathrm{R}_Z}
+\newcommand{\CNOT}{\mathrm{CNOT}}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+% ===================================================================
+\section{Data Preprocessing}
+% ===================================================================
+
+\subsection{Eq.~1: Mean Imputation}
+
+For a feature column $j$ with observed index set $S_j$, missing values are
+replaced by the column mean:
+\begin{equation}\label{eq:mean_imputation}
+  \hat{x}_{ij} =
+  \begin{cases}
+    x_{ij}                                     & \text{if } i \in S_j, \\[4pt]
+    \displaystyle\frac{1}{|S_j|}\sum_{k \in S_j} x_{kj} & \text{otherwise}.
+  \end{cases}
+\end{equation}
+
+\subsection{Eq.~2: Min-Max Normalisation}
+
+Each feature $j$ is scaled to the interval $[0, 1]$ for quantum-gate
+compatibility:
+\begin{equation}\label{eq:minmax}
+  x'_{ij} = \frac{x_{ij} - \min_j}{\max_j - \min_j},
+  \qquad x'_{ij} \in [0, 1].
+\end{equation}
+
+\subsection{Eq.~3: One-Hot Encoding}
+
+A categorical feature $k$ with $C_k$ categories is mapped to an indicator
+vector:
+\begin{equation}\label{eq:onehot}
+  \mathbf{e}_k(c) = [\underbrace{0, \ldots, 0}_{c-1},\; 1,\;
+                      \underbrace{0, \ldots, 0}_{C_k - c}]
+  \in \{0,1\}^{C_k}.
+\end{equation}
+
+% ===================================================================
+\section{Quantum Feature Map}
+% ===================================================================
+
+\subsection{Eq.~4: Angle Embedding}
+
+The normalised classical feature vector $\mathbf{x} = (x_1, \ldots, x_n)$
+is encoded onto $n$ qubits via $\RY$ rotations:
+\begin{equation}\label{eq:angle_embedding}
+  \ket{\phi(\mathbf{x})} =
+  \bigotimes_{i=1}^{n} \RY(\pi \, x_i) \ket{0}.
+\end{equation}
+
+This maps each feature to a point on the Bloch sphere, exploiting the full
+range $[0, \pi]$ of the rotation angle.
+
+% ===================================================================
+\section{Spectral Feature Engineering}
+% ===================================================================
+
+\subsection{Eq.~5: FFT Power Spectrum}
+
+Given a discrete signal $\{x(n)\}_{n=0}^{N-1}$, the Discrete Fourier
+Transform is:
+\[
+  X(k) = \sum_{n=0}^{N-1} x(n)\, e^{-i 2\pi k n / N},
+  \qquad k = 0, 1, \ldots, N-1.
+\]
+The \textbf{power spectrum} captures energy per frequency:
+\begin{equation}\label{eq:fft_power}
+  P(k) = \frac{|X(k)|^2}{N},
+  \qquad k = 0, 1, \ldots, \lfloor N/2 \rfloor - 1.
+\end{equation}
+
+\subsection{Eq.~6: DCT-II Energy Compaction}
+
+The Type-II Discrete Cosine Transform (with orthonormal normalisation):
+\begin{equation}\label{eq:dct}
+  C(k) = \sqrt{\frac{2}{N}} \sum_{n=0}^{N-1}
+         x(n)\, \cos\!\left[\frac{\pi}{N}\!\left(n + \tfrac{1}{2}\right) k\right],
+  \quad k = 0, 1, \ldots, K-1.
+\end{equation}
+
+The DCT-II has an optimal energy-compaction property: most of the signal
+energy is concentrated in the first few coefficients $C(0), C(1), \ldots$,
+making it ideal for dimensionality reduction of financial time-series.
+
+% ===================================================================
+\section{Variational Quantum Circuit}
+% ===================================================================
+
+\subsection{Eq.~7: Parameterised Ansatz}
+
+A single layer $\ell$ of the variational circuit consists of:
+
+\begin{enumerate}
+  \item \textbf{Single-qubit rotations}:
+    \[
+      U_{\text{rot}}^{(\ell)} = \bigotimes_{q=1}^{n}
+        \RZ\!\bigl(\phi_q^{(\ell)}\bigr)\;
+        \RX\!\bigl(\theta_q^{(\ell)}\bigr)
+    \]
+  \item \textbf{Entangling layer} (nearest-neighbour CNOT ring):
+    \[
+      U_{\text{ent}} = \prod_{q=1}^{n}
+        \CNOT_{q,\, (q \bmod n)+1}
+    \]
+\end{enumerate}
+
+The full $L$-layer ansatz is:
+\begin{equation}\label{eq:vqc}
+  U(\boldsymbol{\theta}) = \prod_{\ell=1}^{L}
+    U_{\text{ent}}\; U_{\text{rot}}^{(\ell)}.
+\end{equation}
+
+% ===================================================================
+\section{Quantum Kernel}
+% ===================================================================
+
+\subsection{Eq.~8: Kernel Function}
+
+The quantum feature map $\ket{\phi(\mathbf{x})}$ is the state produced by
+applying the variational circuit to the angle-embedded input:
+\[
+  \ket{\phi(\mathbf{x})} = U(\boldsymbol{\theta})\;
+  \bigotimes_{i=1}^{n} \RY(\pi\, x_i)\ket{0}.
+\]
+
+The \textbf{quantum kernel} is the squared overlap of two feature-mapped
+states:
+\begin{equation}\label{eq:kernel}
+  K(\mathbf{x}_i, \mathbf{x}_j) =
+  \bigl|\!\braket{\phi(\mathbf{x}_i)}{\phi(\mathbf{x}_j)}\!\bigr|^2.
+\end{equation}
+
+This is measured on quantum hardware (or simulator) by preparing
+$U^\dagger(\mathbf{x}_j)\, U(\mathbf{x}_i)\ket{0}^{\otimes n}$ and
+measuring the probability of the all-zero bitstring:
+\[
+  K(\mathbf{x}_i, \mathbf{x}_j) =
+  \Pr\!\bigl[\text{measure } \ket{0}^{\otimes n}\bigr].
+\]
+
+The resulting Gram matrix $K_{ij} = K(\mathbf{x}_i, \mathbf{x}_j)$ is
+guaranteed to be positive semi-definite and is used with a classical SVM
+solver via \texttt{SVC(kernel='precomputed')}.
+
+\end{document}
